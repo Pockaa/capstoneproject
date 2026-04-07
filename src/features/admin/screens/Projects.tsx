@@ -5,6 +5,7 @@ import { ProjectModal } from '../components/projects/ProjectModal';
 import { ProjectDetailsModal } from '../components/projects/ProjectDetailsModal';
 import supabase from '../../../config/supabaseClient';
 import { useTheme } from '../../../context/ThemeContext';
+import { predictProject, type ProjectData } from '../../../utils/ai/projectPrediction';
 
 interface Project {
   id: string;
@@ -265,6 +266,18 @@ export function Projects() {
         <View style={styles.grid}>
           {filteredProjects.map((project) => {
             const statusStyle = getStatusColor(project.status);
+            const aiData: ProjectData = {
+              id: project.id,
+              name: project.name,
+              status: project.status,
+              progress: project.progress,
+              startDate: project.startDate,
+              endDate: project.endDate,
+              budget: project.budget,
+              manager: project.manager,
+              location: project.location,
+            };
+            const prediction = predictProject(aiData);
             return (
               <TouchableOpacity 
                 key={project.id} 
@@ -332,6 +345,41 @@ export function Projects() {
                       />
                     </View>
                   </View>
+
+                  {/* AI Prediction Badge */}
+                  {prediction.status !== 'Not Started' && prediction.status !== 'Completed' && (
+                    <View style={styles.aiPredictionSection}>
+                      <View style={styles.aiPredictionHeader}>
+                        <MaterialCommunityIcons name="robot" size={14} color="#8b5cf6" />
+                        <Text style={styles.aiPredictionLabel}>AI Prediction</Text>
+                      </View>
+                      <View style={styles.aiPredictionBody}>
+                        <View style={[styles.aiStatusBadge, { backgroundColor: prediction.statusColor + '18' }]}>
+                          <View style={[styles.aiStatusDot, { backgroundColor: prediction.statusColor }]} />
+                          <Text style={[styles.aiStatusText, { color: prediction.statusColor }]}>
+                            {prediction.status}
+                          </Text>
+                        </View>
+                        <View style={styles.aiMetricsRow}>
+                          {prediction.predictedEndDate && (
+                            <Text style={styles.aiMetricText}>
+                              Est. {prediction.predictedEndDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </Text>
+                          )}
+                          {prediction.daysVariance > 0 && (
+                            <Text style={[styles.aiMetricText, { color: '#ef4444' }]}>
+                              +{prediction.daysVariance}d late
+                            </Text>
+                          )}
+                          {prediction.daysVariance < 0 && (
+                            <Text style={[styles.aiMetricText, { color: '#22c55e' }]}>
+                              {prediction.daysVariance}d early
+                            </Text>
+                          )}
+                        </View>
+                      </View>
+                    </View>
+                  )}
 
                   {/* Footer */}
                   <View style={styles.cardFooter}>
@@ -750,6 +798,60 @@ const getStyles = (isDark: boolean) => StyleSheet.create({
   },
   deleteModalDeleteText: {
     color: 'white',
+    fontWeight: '500',
+  },
+  // AI Prediction Styles
+  aiPredictionSection: {
+    marginBottom: 16,
+    backgroundColor: isDark ? '#0f172a' : '#faf5ff',
+    borderRadius: 10,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: isDark ? '#334155' : '#ede9fe',
+  },
+  aiPredictionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
+  },
+  aiPredictionLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#8b5cf6',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  aiPredictionBody: {
+    gap: 8,
+  },
+  aiStatusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+  },
+  aiStatusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  aiStatusText: {
+    fontSize: 11,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+  aiMetricsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    flexWrap: 'wrap',
+  },
+  aiMetricText: {
+    fontSize: 12,
+    color: isDark ? '#94a3b8' : '#64748b',
     fontWeight: '500',
   },
 });

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import { ReportAIAnalysis } from '../../../user/components/ReportAIAnalysis';
 
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 
@@ -198,6 +199,16 @@ export function ReportModal({ isOpen, onClose, report, onApprove }: ReportModalP
                   </View>
                 </Card>
               ) : null}
+
+              {/* AI Report Analysis */}
+              <ReportAIAnalysis
+                taskDone={report.task_done || ''}
+                currentTask={report.current_task || ''}
+                materialUsed={report.material_used || ''}
+                materialRequest={report.material_request || ''}
+                projectName={projectName}
+                date={report.date}
+              />
 
               {/* Site Photos */}
               {photos.length > 0 ? (

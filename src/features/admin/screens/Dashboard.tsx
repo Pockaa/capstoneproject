@@ -9,6 +9,7 @@ import { ActiveProjectsModal } from '../components/dashboard/ActiveProjectsModal
 import { PendingReportsModal } from '../components/dashboard/PendingReportsModal';
 import { useTheme } from '../../../context/ThemeContext';
 import supabase from '../../../config/supabaseClient';
+import { AIInsightsPanel } from '../components/dashboard/AIInsightsPanel';
 
 export function Dashboard() {
   const { width } = useWindowDimensions();
@@ -121,6 +122,11 @@ export function Dashboard() {
             icon={(props) => <Feather name="alert-triangle" size={props.size} color={props.color} />}
           />
         </View>
+      </View>
+
+      {/* AI Intelligence Panel */}
+      <View style={styles.section}>
+        <AIInsightsPanel />
       </View>
 
       {/* Main Content Grid: Chart + Recent Reports Table */}

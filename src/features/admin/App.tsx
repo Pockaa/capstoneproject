@@ -9,6 +9,7 @@ import { Projects } from './screens/Projects';
 import { Employees } from './screens/Employees';
 import { Settings } from './screens/Settings';
 import { PlaceholderPage } from './components/PlaceholderPage';
+import { AIChatbot } from './components/chat/AIChatbot';
 
 import { ThemeProvider, useTheme } from '../../context/ThemeContext';
 
@@ -201,6 +202,9 @@ function AdminContent() {
           </View>
         </View>
       </View>
+
+      {/* AI Chatbot (Floating) */}
+      <AIChatbot />
 
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (
